@@ -9,10 +9,13 @@ traverse() {
     while (( tail < $tailMax ))
     do
         code=$(printf "%s%0${tailLen}d" $prefix $tail)
-        url=$(printf "http://stock.jrj.com.cn/share,%s,sdgd.shtml" $code)
-        curl -s $url -o temp1.txt
-        iconv -f GB2312 -t UTF-8 temp1.txt > temp2.txt
-        found=$(grep -nor "前海进化论.*" temp2.txt)
+        url=$(printf "http://quotes.money.163.com/f10/gdfx_%s.html#10e01" $code)
+        curl -s $url -o temp.txt
+        found=$(grep -m 1 -o "前海进化论[^'\"<>/]*" temp.txt)
+        if [[ x$found != x ]]; then
+            echo $code: $found
+        fi
+        found=$(grep -m 1 -o "希瓦[^'\"<>/]*" temp.txt)
         if [[ x$found != x ]]; then
             echo $code: $found
         fi
@@ -26,4 +29,4 @@ traverse '000' 1000 3
 traverse '002' 1000 3
 traverse '300' 1000 3
 
-rm temp1.txt temp2.txt
+rm -f temp.txt
